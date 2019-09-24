@@ -2,10 +2,12 @@ from requests_oauthlib import OAuth2Session
 from requests.auth import HTTPBasicAuth
 from mastodon import Mastodon
 from datetime import date
+from os import path
 import json
 
+PATH = path.dirname(path.abspath(__file__))
 def read_fitbit_key():
-    with open("key/fitbit_token.secret") as f:
+    with open(PATH + "/key/fitbit_token.secret", "r") as f:
         key = f.readlines()
     client_id = key[0][:-1]
     client_secret = key[1][:-1]
@@ -26,7 +28,7 @@ class fitbit_client(object):
         )
 
     def refresh_call_back(token):
-            with open("key/fitbit_token.secret", "w") as f:
+            with open(PATH + "/key/fitbit_token.secret", "w") as f:
                 f.write(client_id + "\n")
                 f.write(client_secret + "\n")
                 f.write(token["access_token"] + "\n")
@@ -80,7 +82,7 @@ def mstdn_name_update(status):
         access_token="key/username-updater-usercred.secret",
         api_base_url="https://mstdn.maud.io"
     )
-    with open("mstdn-id.txt", "r") as f:
+    with open(PATH + "/mstdn-id.txt", "r") as f:
         id = int(f.read())
     display_name = mastodon.account(id)["display_name"][:-2]
     mastodon.account_update_credentials(display_name = display_name + status)
