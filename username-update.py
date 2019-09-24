@@ -59,21 +59,33 @@ class fitbit_client(object):
         return(self.make_request(url))
 
     def get_heart_rate(self):
-        url = "https://api.fitbit.com/1/user/-/activities/heart/date/today/1d.json"
-        return()
+        url = "https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/5min.json"
+        return(self.make_request(url))
 
-def mstdn_name_update():
+def get_user_status(client):
+    heart_rate_data = json.loads(client.get_heart_rate().content.decode("utf8"))
+    heart_rate_zone = heart_rate_data["activities-heart"][0]["value"]["heartRateZones"]
+    heart_rate = heart_rate_data["activities-heart-intraday"]["dataset"][-1]["value"]
+    status_name = "non"
+    for zone in heart_rate_zone:
+        if zone["min"] < heart_rate and heart_rate <= zone["max"]:
+            status_name = zone["name"]
+    status_dic = {"Out of Range": " 😐","Fat Burn": " 😐","Cardio": " 😓","Peak": " 😅", "non": " 🤔"}
+    status = status_dic[status_name]
+    return(status)
+
+def mstdn_name_update(status):
     mastodon = Mastodon(
         access_token="key/username-updater-usercred.secret",
         api_base_url="https://mstdn.maud.io"
     )
-    mastodon.account_update_credentials(
-        display_name="***"
-    )
+    with open("mstdn-id.txt", "r") as f:
+        id = int(f.read())
+    display_name = mastodon.account(id)["display_name"][:-2]
+    mastodon.account_update_credentials(display_name = display_name + status)
 
 if __name__ == "__main__":
     client_id, client_secret, access_token, refresh_token = read_fitbit_key()
     client = fitbit_client(client_id, client_secret, access_token, refresh_token)
-    sleep = client.get_sleep()
-    print(sleep)
-    print(sleep.content)
+    status = get_user_status(client)
+    mstdn_name_update(status)
