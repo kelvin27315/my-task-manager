@@ -63,6 +63,7 @@ class fitbit_client(object):
         return(self.make_request(url))
 
 def get_user_status(client):
+    #sleep_data = json.loads(client.get_sleep().content.decode("utf8"))["sleep"]
     heart_rate_data = json.loads(client.get_heart_rate().content.decode("utf8"))
     heart_rate_zone = heart_rate_data["activities-heart"][0]["value"]["heartRateZones"]
     heart_rate = heart_rate_data["activities-heart-intraday"]["dataset"][-1]["value"]
@@ -70,7 +71,7 @@ def get_user_status(client):
     for zone in heart_rate_zone:
         if zone["min"] < heart_rate and heart_rate <= zone["max"]:
             status_name = zone["name"]
-    status_dic = {"Out of Range": " 😐","Fat Burn": " 😐","Cardio": " 😓","Peak": " 😅", "non": " 🤔"}
+    status_dic = {"Out of Range": " 😐","Fat Burn": " 😓","Cardio": " 😅","Peak": " 😅", "non": " 🤔"}
     status = status_dic[status_name]
     return(status)
 
