@@ -1,4 +1,5 @@
 # my-task-manager
 
 ## username-update.py
-fitbit apiからユーザの情報を取ってきてツイッターとかマストドンのディスプレイネームを更新
+
+fitbit apiからユーザーの最新の心拍数を取得して心拍数に応じた顔文字をマストドンのアカウントdisplay namaの末尾に追加
